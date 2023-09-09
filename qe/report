@@ -1,0 +1,24 @@
+------ WALLTIME ------
+./slurm-para2/scf.out
+./slurm-para4/scf.out
+./slurm-para1/scf.out
+./slurm-para3/scf.out
+
+------ SECS ------
+
+SECS
+./slurm-para2/scf.out
+./slurm-para4/scf.out
+./slurm-para1/scf.out
+     total cpu time spent up to now is        1.7 secs
+     total cpu time spent up to now is        7.1 secs
+     total cpu time spent up to now is       10.9 secs
+     total cpu time spent up to now is       16.9 secs
+     total cpu time spent up to now is       22.2 secs
+     total cpu time spent up to now is       25.4 secs
+     total cpu time spent up to now is       30.3 secs
+     total cpu time spent up to now is       34.7 secs
+     total cpu time spent up to now is       38.3 secs
+     total cpu time spent up to now is       42.2 secs
+     total cpu time spent up to now is       46.8 secs
+./slurm-para3/scf.out

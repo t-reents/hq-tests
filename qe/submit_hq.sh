@@ -19,8 +19,11 @@ echo "Total Number of tasks: $SLURM_NTASKS"
 echo "CPUs on this Node: $SLURM_CPUS_ON_NODE"
 
 /pfs/lustrep3/users/mabercx/bin/hq worker start --no-hyper-threading &
+sleep 1
 /pfs/lustrep3/users/mabercx/bin/hq worker start --no-hyper-threading &
+sleep 1
 /pfs/lustrep3/users/mabercx/bin/hq worker start --no-hyper-threading &
+sleep 1
 /pfs/lustrep3/users/mabercx/bin/hq worker start --no-hyper-threading &
 
 wait
