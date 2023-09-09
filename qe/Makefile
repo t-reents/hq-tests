@@ -1,5 +1,7 @@
 SLURM_SINGLE_DIR = slurm-single
 SLURM_PARA_DIR = slurm-para
+HQ_SINGLE_DIR = hq-single
+HQ_PARA_DIR = hq-para
 
 slurm-single:
 	@mkdir -p $(SLURM_SINGLE_DIR)
@@ -15,35 +17,34 @@ slurm-parallel:
 	done
 	@sbatch submit_qe_parallel.sh | awk '{print $$NF}' >> job_ids
 
-single:
+hq-single:
 	@sbatch submit_hq_single.sh | awk '{print $$NF}' >> job_ids
-	@mkdir -p single
-	@cp scf.in single && cp -r pseudo single;\
-	cp qe.sh single ;\
-	cd single ;\
+	@mkdir -p $(HQ_SINGLE_DIR)
+	@cp scf.in $(HQ_SINGLE_DIR) && cp -r pseudo $(HQ_SINGLE_DIR);\
+	cp qe.sh $(HQ_SINGLE_DIR) ;\
+	cd $(HQ_SINGLE_DIR) ;\
 	hq submit qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
 	cd ..
 
-serial:
+hq-serial:
 	@sbatch submit_hq_single.sh | awk '{print $$NF}' >> job_ids
 	@for i in 1 2 3 4; do \
-		@mkdir -p run$$i ;\
-		cp scf.in run$$i && cp -r pseudo run$$i;\
-		cp qe.sh run$$i ;\
-		cd run$$i ;\
+		@mkdir -p $(HQ_DIR)$$i ;\
+		cp scf.in $(HQ_DIR)$$i && cp -r pseudo $(HQ_DIR)$$i;\
+		cp qe.sh $(HQ_DIR)$$i ;\
+		cd $(HQ_DIR)$$i ;\
 		hq submit qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
 		cd .. ;\
 		sleep 1;\
 	done
 
-parallel:
-	@sbatch submit_hq.sh | awk '{print $$NF}' >> job_ids
-	sleep 4
+hq-parallel:
+	@sbatch submit_hq_parallel.sh | awk '{print $$NF}' >> job_ids
 	@for i in 1 2 3 4; do \
-		mkdir -p run$$i ;\
-		cp scf.in run$$i && cp -r pseudo run$$i;\
-		cp qe.sh run$$i ;\
-		cd run$$i ;\
+		mkdir -p $(HQ_DIR)$$i ;\
+		cp scf.in $(HQ_DIR)$$i && cp -r pseudo $(HQ_DIR)$$i;\
+		cp qe.sh $(HQ_DIR)$$i ;\
+		cd $(HQ_DIR)$$i ;\
 		hq submit qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
 		cd .. ;\
 		sleep 1;\
@@ -54,7 +55,7 @@ clean:
 	@for id in $$(cat job_ids); do scancel $$id; done && rm job_ids
 	@for id in $$(cat hq_ids); do hq job cancel $$id 2>/dev/null; done && rm hq_ids
 	@for dir in $$(find . -type d -not -name pseudo -not -name "."); do rm -rf $$dir; done
-	@rm _scheduler*
+	@find . -maxdepth 1 -name "_scheduler*" -o -name report -print0 | xargs -0 rm -f
 
 secs:
 	@for out in $$(find . -name scf.out); do echo $$out; grep 'secs' $$out; done
