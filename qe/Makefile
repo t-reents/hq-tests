@@ -29,26 +29,30 @@ hq-single:
 hq-serial:
 	@sbatch submit_hq_single.sh | awk '{print $$NF}' >> job_ids
 	@for i in 1 2 3 4; do \
-		@mkdir -p $(HQ_DIR)$$i ;\
-		cp scf.in $(HQ_DIR)$$i && cp -r pseudo $(HQ_DIR)$$i;\
-		cp qe.sh $(HQ_DIR)$$i ;\
-		cd $(HQ_DIR)$$i ;\
+		@mkdir -p $(HQ_PARA_DIR)$$i ;\
+		cp scf.in $(HQ_PARA_DIR)$$i && cp -r pseudo $(HQ_PARA_DIR)$$i;\
+		cp qe.sh $(HQ_PARA_DIR)$$i ;\
+		cd $(HQ_PARA_DIR)$$i ;\
 		hq submit qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
 		cd .. ;\
 		sleep 1;\
 	done
 
-hq-parallel:
+submit-slurm:
 	@sbatch submit_hq_parallel.sh | awk '{print $$NF}' >> job_ids
+
+submit-hq:
 	@for i in 1 2 3 4; do \
-		mkdir -p $(HQ_DIR)$$i ;\
-		cp scf.in $(HQ_DIR)$$i && cp -r pseudo $(HQ_DIR)$$i;\
-		cp qe.sh $(HQ_DIR)$$i ;\
-		cd $(HQ_DIR)$$i ;\
+		mkdir -p $(HQ_PARA_DIR)$$i ;\
+		cp scf.in $(HQ_PARA_DIR)$$i && cp -r pseudo $(HQ_PARA_DIR)$$i;\
+		cp qe.sh $(HQ_PARA_DIR)$$i ;\
+		cd $(HQ_PARA_DIR)$$i ;\
 		hq submit qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
 		cd .. ;\
 		sleep 1;\
 	done
+
+hq-parallel: submit-slurm submit-hq
 
 clean:
 	@echo '' >> job_ids && echo '' >> hq_ids
