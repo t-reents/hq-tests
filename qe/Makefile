@@ -58,7 +58,9 @@ secs:
 	@for out in $$(find . -name scf.out); do echo $$out; grep 'secs' $$out; done
 
 report:
-	@echo '------ WALLTIME ------' > report
+	@echo '------ START ------' > report
+	@for out in $$(find . -name scf.out); do echo $$out | tee -a report; grep 'Program PWSCF' $$out | tee -a report; done
+	@echo '------ WALLTIME ------' >> report
 	@for out in $$(find . -name scf.out); do echo $$out | tee -a report; grep 'PWSCF        :' $$out | tee -a report; done
 	@echo >> report
 	@echo '------ SECS ------'  >> report
