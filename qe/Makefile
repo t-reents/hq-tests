@@ -3,6 +3,8 @@ SLURM_PARA_DIR = slurm-para
 HQ_SINGLE_DIR = hq-single
 HQ_PARA_DIR = hq-para
 
+N ?= 4
+
 slurm-single:
 	@mkdir -p $(SLURM_SINGLE_DIR)
 	@cp scf.in $(SLURM_SINGLE_DIR) && cp -r pseudo $(SLURM_SINGLE_DIR) && cp submit_qe_single.sh $(SLURM_SINGLE_DIR)
@@ -10,38 +12,36 @@ slurm-single:
 	sbatch submit_qe_single.sh
 
 slurm-parallel:
-	@for i in 1 2 3 4; do \
+	@for (( i=1; i<=$(N); i++ )); do \
 		mkdir -p $(SLURM_PARA_DIR)$$i ;\
 		cp scf.in $(SLURM_PARA_DIR)$$i ;\
 		cp -r pseudo $(SLURM_PARA_DIR)$$i ;\
 	done
-	@sbatch submit_qe_parallel.sh | awk '{print $$NF}' >> job_ids
-
-hq-single:
-	@sbatch submit_hq_single.sh | awk '{print $$NF}' >> job_ids
-	@mkdir -p $(HQ_SINGLE_DIR)
-	@cp scf.in $(HQ_SINGLE_DIR) && cp -r pseudo $(HQ_SINGLE_DIR);\
-	cp qe.sh $(HQ_SINGLE_DIR) ;\
-	cd $(HQ_SINGLE_DIR) ;\
-	hq submit qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
-	cd ..
+	@sbatch --nodes=$(N) submit_qe_parallel.sh | awk '{print $$NF}' >> job_ids
 
 submit-slurm-single:
 	@sbatch submit_hq_single.sh | awk '{print $$NF}' >> job_ids
 
 submit-slurm-para:
-	@sbatch submit_hq_parallel.sh | awk '{print $$NF}' >> job_ids
+	@sbatch --nodes=$(N) submit_hq_parallel.sh | awk '{print $$NF}' >> job_ids
 
 submit-hq:
-	@for i in 1 2 3 4; do \
+	@for (( i=1; i<=$(N); i++ )); do \
 		mkdir -p $(HQ_PARA_DIR)$$i ;\
 		cp scf.in $(HQ_PARA_DIR)$$i && cp -r pseudo $(HQ_PARA_DIR)$$i;\
 		cp qe.sh $(HQ_PARA_DIR)$$i ;\
 		cd $(HQ_PARA_DIR)$$i ;\
-		hq submit qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
+		hq submit --name QE-run$$i qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
 		cd .. ;\
-		sleep 1;\
 	done
+
+hq-single: submit-slurm-single
+	@mkdir -p $(HQ_SINGLE_DIR)
+	@cp scf.in $(HQ_SINGLE_DIR) && cp -r pseudo $(HQ_SINGLE_DIR);\
+	cp qe.sh $(HQ_SINGLE_DIR) ;\
+	cd $(HQ_SINGLE_DIR) ;\
+	hq submit --name QE-single qe.sh | awk '{print $$NF}' >> ../hq_ids ;\
+	cd ..
 
 hq-serial: submit-slurm-single submit-hq
 
