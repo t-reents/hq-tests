@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --no-requeue
 #SBATCH --get-user-env
-#SBATCH --job-name="aiida-1037233"
+#SBATCH --job-name="HQ_worker"
 #SBATCH --uenv=/capstor/scratch/cscs/simonpi/uenv-images/qe-sirius-md-8.1.30.sqfs
 #SBATCH --output=_scheduler-stdout.txt
 #SBATCH --error=_scheduler-stderr.txt

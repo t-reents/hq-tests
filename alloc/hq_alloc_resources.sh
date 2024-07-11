@@ -13,10 +13,8 @@ echo "Desired number of workers: $N"
 echo "Sleep time: $sleep_time seconds"
 
 while true; do
-    hq_worker_info=$(hq worker list)
-
-    # Count the number of workers (non-header rows) from the table
-    worker_count=$(echo "$hq_worker_info" | grep -E '^\| +[0-9]+ +\|' | wc -l)
+    # Count the number of slurm jobs of the user with job name HQ_worker
+    worker_count=$(squeue -h --user=$USER --name=HQ_worker | wc -l)
 
     empty_slots=$((N - worker_count))
 
@@ -26,7 +24,7 @@ while true; do
         for ((i = 0; i < empty_slots; i++)); do
             echo "Running command $((i + 1)) of $empty_slots."
             $command_to_run
-	    sleep 2
+	    sleep 0.5
         done
 	sleep $sleep_time
     else
